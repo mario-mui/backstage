@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Backstage Authors
+ * Copyright 2023 The Backstage Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,5 @@
  * limitations under the License.
  */
 
-export { serveBackend } from './backend';
-export { buildBundle } from './bundle';
-export { buildScalprumBundle } from './bundlePlugin';
-export { serveBundle } from './server';
+export * from './LikeDislikeButtons';
+export { default } from './LikeDislikeButtons';

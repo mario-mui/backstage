@@ -16,15 +16,14 @@
 
 import yn from 'yn';
 import fs from 'fs-extra';
-import { resolve as resolvePath } from 'path';
 import webpack from 'webpack';
 import {
   measureFileSizesBeforeBuild,
   printFileSizesAfterBuild,
 } from 'react-dev-utils/FileSizeReporter';
 import formatWebpackMessages from 'react-dev-utils/formatWebpackMessages';
-import { createConfig, resolveBaseUrl } from './config';
-import { BuildOptions } from './types';
+import { resolveBaseUrl } from './config';
+import { createMDFConfig } from './mdfConfig';
 import { resolveBundlingPaths } from './paths';
 import chalk from 'chalk';
 
@@ -36,15 +35,14 @@ function applyContextToError(error: string, moduleName: string): string {
   return `Failed to compile '${moduleName}':\n  ${error}`;
 }
 
-export async function buildBundle(options: BuildOptions) {
-  const { statsJsonEnabled, schema: configSchema } = options;
-
+export async function buildScalprumBundle(options: any) {
   const paths = resolveBundlingPaths(options);
-  const config = await createConfig(paths, {
+  const config = await createMDFConfig(paths, {
     ...options,
     checksEnabled: false,
     isDev: false,
     baseUrl: resolveBaseUrl(options.frontendConfig),
+    isBackend: false,
   });
 
   const isCi = yn(process.env.CI, { default: false });
@@ -52,33 +50,10 @@ export async function buildBundle(options: BuildOptions) {
   const previousFileSizes = await measureFileSizesBeforeBuild(paths.targetDist);
   await fs.emptyDir(paths.targetDist);
 
-  if (paths.targetPublic) {
-    await fs.copy(paths.targetPublic, paths.targetDist, {
-      dereference: true,
-      filter: file => file !== paths.targetHtml,
-    });
-  }
-
-  if (configSchema) {
-    await fs.writeJson(
-      resolvePath(paths.targetDist, '.config-schema.json'),
-      configSchema.serialize(),
-      { spaces: 2 },
-    );
-  }
-
   const { stats } = await build(config, isCi);
 
   if (!stats) {
     throw new Error('No stats returned');
-  }
-
-  if (statsJsonEnabled) {
-    // No @types/bfj
-    await require('bfj').write(
-      resolvePath(paths.targetDist, 'bundle-stats.json'),
-      stats.toJson(),
-    );
   }
 
   printFileSizesAfterBuild(

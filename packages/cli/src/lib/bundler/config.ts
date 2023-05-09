@@ -20,7 +20,7 @@ import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import ModuleScopePlugin from 'react-dev-utils/ModuleScopePlugin';
 import { RunScriptWebpackPlugin } from 'run-script-webpack-plugin';
-import webpack, { ProvidePlugin } from 'webpack';
+import webpack, { ProvidePlugin, container } from 'webpack';
 import nodeExternals from 'webpack-node-externals';
 import { isChildPath } from '@backstage/cli-common';
 import { getPackages } from '@manypkg/get-packages';
@@ -38,6 +38,14 @@ import ESLintPlugin from 'eslint-webpack-plugin';
 import pickBy from 'lodash/pickBy';
 import yn from 'yn';
 import { readEntryPoints } from '../entryPoints';
+import { sharedModules } from './mdfConfig';
+
+const { ModuleFederationPlugin } = container;
+const mdfPlugin = new ModuleFederationPlugin({
+  name: 'backstageHost',
+  filename: 'backstageHost.[fullhash].js',
+  shared: [sharedModules],
+});
 
 const BUILD_CACHE_ENV_VAR = 'BACKSTAGE_CLI_EXPERIMENTAL_BUILD_CACHE';
 
@@ -139,6 +147,8 @@ export async function createConfig(
       'process.env.BUILD_INFO': JSON.stringify(buildInfo),
     }),
   );
+
+  plugins.push(mdfPlugin);
 
   // These files are required by the transpiled code when using React Refresh.
   // They need to be excluded to the module scope plugin which ensures that files

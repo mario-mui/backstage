@@ -69,6 +69,7 @@ export function resolveBundlingPaths(options: BundlingPathsOptions) {
     targetPackageJson: resolvePath(targetDir, 'package.json'),
     rootNodeModules: paths.resolveTargetRoot('node_modules'),
     root: paths.targetRoot,
+    targetScalprumDist: resolvePath(targetDir, 'dist'),
   };
 }
 

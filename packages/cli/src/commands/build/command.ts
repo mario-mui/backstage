@@ -22,9 +22,22 @@ import { paths } from '../../lib/paths';
 import { buildFrontend } from './buildFrontend';
 import { buildBackend } from './buildBackend';
 import { isValidUrl } from '../../lib/urls';
+import fs from 'fs-extra';
+import { resolve as resolvePath } from 'path';
+import { buildScalprumPlugin } from './buildScalprumPlugin';
 
 export async function command(opts: OptionValues): Promise<void> {
   const role = await findRoleFromCommand(opts);
+  const { scalprum } = await fs.readJson(
+    resolvePath(paths.targetDir, 'package.json'),
+  );
+
+  if (scalprum) {
+    return buildScalprumPlugin({
+      targetDir: paths.targetDir,
+      pluginMetadata: scalprum,
+    });
+  }
 
   if (role === 'frontend' || role === 'backend') {
     const configPaths = (opts.config as string[]).map(arg => {

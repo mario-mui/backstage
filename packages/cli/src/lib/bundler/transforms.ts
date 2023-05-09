@@ -18,6 +18,7 @@ import { ModuleOptions, WebpackPluginInstance } from 'webpack';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import { svgrTemplate } from '../svgrTemplate';
 import ReactRefreshPlugin from '@pmmmwh/react-refresh-webpack-plugin';
+import { DynamicPluginOptions } from './types';
 
 type Transforms = {
   loaders: ModuleOptions['rules'];
@@ -29,7 +30,9 @@ type TransformOptions = {
   isBackend?: boolean;
 };
 
-export const transforms = (options: TransformOptions): Transforms => {
+export const transforms = (
+  options: TransformOptions | DynamicPluginOptions,
+): Transforms => {
   const { isDev, isBackend } = options;
 
   // This ensures that styles inserted from the style-loader and any

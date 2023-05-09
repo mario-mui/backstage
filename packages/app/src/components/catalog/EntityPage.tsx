@@ -171,6 +171,7 @@ import {
   isLinguistAvailable,
   EntityLinguistCard,
 } from '@backstage/plugin-linguist';
+import { ScalprumComponent, ScalprumProvider } from '@scalprum/react-core';
 
 const customEntityFilterKind = ['Component', 'API', 'System'];
 
@@ -397,6 +398,21 @@ const overviewContent = (
     <Grid item md={2}>
       <InfoCard title="Rate this entity">
         <LikeDislikeButtons />
+      </InfoCard>
+    </Grid>
+
+    <Grid item md={2}>
+      <InfoCard title="Rate this entity remote example">
+        <ScalprumProvider
+          config={{
+            'plugin-entity-feedback': {
+              name: 'plugin-entity-feedback',
+              manifestLocation: 'http://localhost:8001/plugin-manifest.json',
+            },
+          }}
+        >
+          <ScalprumComponent scope="plugin-entity-feedback" module="./LikeDislikeButtons" />
+        </ScalprumProvider>
       </InfoCard>
     </Grid>
 
