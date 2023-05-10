@@ -109,12 +109,44 @@ import { TwoColumnLayout } from './components/scaffolder/customScaffolderLayouts
 import { ScoreBoardPage } from '@oriflame/backstage-plugin-score-card';
 import { StackstormPage } from '@backstage/plugin-stackstorm';
 import { PuppetDbPage } from '@backstage/plugin-puppetdb';
+import I18nextBrowserLanguageDetector from 'i18next-browser-languagedetector';
+import I18NextHttpBackend from 'i18next-http-backend';
 
 const app = createApp({
-  localeConfig: {
-    lng: 'zh',
-    languageOptions: ['en', 'zh'],
-    lazyResources: () => import('./i18nRemoteLocales').then(m => m.locales),
+  translation: {
+    modules: [
+      // When a backend is configured, it will be used to load translations
+      // on namespace or language changed, the backend translations have higher
+      // priority than the resources defined in `i18n.init` below and plugin
+      // definition. The user can config more advanced backends, see:
+      // https://www.i18next.com/overview/plugins-and-utils#backend-extenders
+      I18NextHttpBackend,
+      I18nextBrowserLanguageDetector,
+    ],
+    initOptions: {
+      fallbackLng: {
+        'zh-CN': ['zh', 'en'],
+        default: ['en'],
+      },
+      supportedLngs: ['en', 'zh-CN', 'zh'],
+      resources: {
+        // override partial settings translations according to `supportedLngs`
+        // option, `lng` and `select_lng` are used in language toggle button
+        // group on settings page, so they need to be provided earlier before
+        // backend translations
+        'zh-CN': {
+          settings: {
+            lng: '简体中文',
+            select_lng: '选择简体中文',
+          },
+        },
+        zh: {
+          settings: {
+            lng: '中文 (zh)',
+          },
+        },
+      },
+    },
   },
   apis,
   plugins: Object.values(plugins),

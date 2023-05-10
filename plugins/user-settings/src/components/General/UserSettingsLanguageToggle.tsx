@@ -14,29 +14,17 @@
  * limitations under the License.
  */
 
-import React from 'react';
-import useObservable from 'react-use/lib/useObservable';
-import ToggleButton from '@material-ui/lab/ToggleButton';
+import React, { useCallback, useMemo } from 'react';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import {
   ListItem,
   ListItemText,
   ListItemSecondaryAction,
-  Tooltip,
   makeStyles,
 } from '@material-ui/core';
-import {
-  appTranslationApiRef,
-  useApi,
-  usePluginTranslation,
-} from '@backstage/core-plugin-api';
-import { settingTranslationRef } from '../../translation';
-
-type TooltipToggleButtonProps = {
-  children: JSX.Element;
-  title: string;
-  value: string;
-};
+import { usePluginTranslation } from '@backstage/core-plugin-api';
+import { TooltipToggleButton } from './TooltipToggleButton';
+import { settingsTranslationRef } from '../../translation';
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -71,50 +59,33 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-// ToggleButtonGroup uses React.children.map instead of context
-// so wrapping with Tooltip breaks ToggleButton functionality.
-const TooltipToggleButton = ({
-  children,
-  title,
-  value,
-  ...props
-}: TooltipToggleButtonProps) => (
-  <Tooltip placement="top" arrow title={title}>
-    <ToggleButton value={value} {...props}>
-      {children}
-    </ToggleButton>
-  </Tooltip>
-);
-
 /** @public */
 export const UserSettingsLanguageToggle = () => {
   const classes = useStyles();
-  const translationApi = useApi(appTranslationApiRef);
-  const { t } = usePluginTranslation(settingTranslationRef);
 
-  const activeLanguage = useObservable(
-    translationApi.activeLanguage$(),
-    translationApi.getActiveLanguage(),
+  const { t, i18n } = usePluginTranslation(settingsTranslationRef);
+
+  const supportedLngs = useMemo(
+    () => (i18n.options.supportedLngs || []).filter(lng => lng !== 'cimode'),
+    [i18n.options.supportedLngs],
   );
 
-  const languages = translationApi.getLanguages();
+  const handleSetLanguage = useCallback(
+    (_event: React.MouseEvent<HTMLElement>, newValue: string) => {
+      if (!newValue || newValue === i18n.language) {
+        return;
+      }
+      if (supportedLngs.some(l => l === newValue)) {
+        i18n.changeLanguage(newValue);
+      } else {
+        i18n.changeLanguage(undefined);
+      }
+    },
+    [i18n, supportedLngs],
+  );
 
-  const handleSetLanguage = (
-    _event: React.MouseEvent<HTMLElement>,
-    newValue: string,
-  ) => {
-    if (!newValue || newValue === activeLanguage) {
-      return;
-    }
-    if (languages.some(l => l === newValue)) {
-      translationApi.setActiveLanguage(newValue);
-    } else {
-      translationApi.setActiveLanguage(undefined);
-    }
-  };
-
-  if (!languages?.length) {
-    return <></>;
+  if (!supportedLngs.length) {
+    return null;
   }
 
   return (
@@ -131,17 +102,17 @@ export const UserSettingsLanguageToggle = () => {
         <ToggleButtonGroup
           exclusive
           size="small"
-          value={activeLanguage}
+          value={i18n.language}
           onChange={handleSetLanguage}
         >
-          {languages.map(language => {
+          {supportedLngs.map(lng => {
             return (
               <TooltipToggleButton
-                key={language}
-                title={`${t('select', 'Select')} ${language}`}
-                value={language}
+                key={lng}
+                title={t('select_lng', { lng })}
+                value={lng}
               >
-                <>{t(language)}</>
+                {t('lng', { lng })}
               </TooltipToggleButton>
             );
           })}
