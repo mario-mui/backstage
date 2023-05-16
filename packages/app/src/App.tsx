@@ -114,6 +114,11 @@ import { customDevToolsPage } from './components/devtools/CustomDevToolsPage';
 import { CatalogUnprocessedEntitiesPage } from '@backstage/plugin-catalog-unprocessed-entities';
 
 const app = createApp({
+  localeConfig: {
+    lng: 'zh',
+    languageOptions: ['en', 'zh'],
+    lazyResources: () => import('./i18nRemoteLocales').then(m => m.locales),
+  },
   apis,
   plugins: Object.values(plugins),
   icons: {
