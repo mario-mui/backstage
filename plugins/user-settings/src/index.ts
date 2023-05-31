@@ -27,3 +27,4 @@ export {
   UserSettingsPage,
 } from './plugin';
 export * from './components/';
+export * from './translation';
