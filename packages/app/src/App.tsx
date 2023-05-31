@@ -82,6 +82,7 @@ import {
 import {
   SettingsLayout,
   UserSettingsPage,
+  userSettingsTranslationRef,
 } from '@backstage/plugin-user-settings';
 import { AdvancedSettings } from './components/advancedSettings';
 import AlarmIcon from '@material-ui/icons/Alarm';
@@ -114,6 +115,7 @@ import { customDevToolsPage } from './components/devtools/CustomDevToolsPage';
 import { CatalogUnprocessedEntitiesPage } from '@backstage/plugin-catalog-unprocessed-entities';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import Backend from 'i18next-http-backend';
+import { Translations } from '@backstage/core-plugin-api';
 
 const app = createApp({
   initI18next: {
@@ -129,7 +131,7 @@ const app = createApp({
           'user-settings': {
             lng: '简体中文',
             select_lng: '选择简体中文',
-          },
+          } satisfies Translations<typeof userSettingsTranslationRef>,
         },
       },
     },

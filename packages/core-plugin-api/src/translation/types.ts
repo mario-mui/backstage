@@ -33,3 +33,10 @@ export interface TranslationRef<
 
   getLazyResources(): Record<string, () => Promise<{ messages: LazyMessages }>>;
 }
+
+export type Translations<T extends TranslationRef> = T extends TranslationRef<
+  infer LazyMessages,
+  infer Messages
+>
+  ? Partial<Record<keyof LazyMessages | keyof Messages, string>>
+  : never;
