@@ -25,9 +25,10 @@ import {
   ExternalRouteRef,
   IdentityApi,
   FeatureFlag,
+  TranslationRef,
 } from '@backstage/core-plugin-api';
 import { AppConfig } from '@backstage/config';
-import { Module, InitOptions, NewableModule, Newable } from 'i18next';
+import { FallbackLng } from 'i18next';
 
 /**
  * Props for the `BootErrorPage` component of {@link AppComponents}.
@@ -180,6 +181,18 @@ export type AppRouteBinder = <
 ) => void;
 
 /**
+ * The message defined in CreateApp for customize plugin's messages
+ *
+ */
+export type AppMessage<
+  Messages extends Record<keyof Messages, string> = Record<string, string>,
+> = {
+  ref: TranslationRef<Messages>;
+  lazyMessages?: Record<string, () => Promise<{ messages: Messages }>>;
+  messages?: Record<string, Messages>;
+};
+
+/**
  * The options accepted by {@link createSpecializedApp}.
  *
  * @public
@@ -281,9 +294,10 @@ export type AppOptions = {
    */
   bindRoutes?(context: { bind: AppRouteBinder }): void;
 
-  initI18next?: {
-    modules?: Array<Module | Newable<Module> | NewableModule<Module>>;
-    options?: InitOptions;
+  i18n?: {
+    supportedLanguages: string[];
+    fallbackLanguage?: FallbackLng;
+    messages?: AppMessage[];
   };
 };
 

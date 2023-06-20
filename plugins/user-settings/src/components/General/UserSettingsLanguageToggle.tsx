@@ -130,12 +130,14 @@ export const UserSettingsLanguageToggle = () => {
                 key={lng}
                 title={t('select_lng', {
                   lng,
+                  defaultValue: 'Select English',
                 })}
                 value={lng}
               >
                 <>
                   {t('lng', {
                     lng,
+                    defaultValue: 'English',
                   })}
                 </>
               </TooltipToggleButton>

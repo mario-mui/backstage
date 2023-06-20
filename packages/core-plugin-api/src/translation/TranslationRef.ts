@@ -16,15 +16,12 @@
 
 import { TranslationRef, TranslationRefConfig } from './types';
 
-export class TranslationRefImpl<
-  LazyMessages extends Record<string, string>,
-  Messages extends Record<string, string>,
-> implements TranslationRef<LazyMessages, Messages>
+export class TranslationRefImpl<Messages extends Record<keyof Messages, string>>
+  implements TranslationRef<Messages>
 {
-  static create<
-    LazyMessages extends Record<string, string>,
-    Messages extends Record<string, string>,
-  >(config: TranslationRefConfig<LazyMessages, Messages>) {
+  static create<Messages extends Record<keyof Messages, string>>(
+    config: TranslationRefConfig<Messages>,
+  ) {
     return new TranslationRefImpl(config);
   }
 
@@ -32,10 +29,7 @@ export class TranslationRefImpl<
     return this.config.id;
   }
 
-  getLazyResources(): Record<
-    string,
-    () => Promise<{ messages: LazyMessages }>
-  > {
+  getLazyResources(): Record<string, () => Promise<{ messages: Messages }>> {
     return this.config.lazyResources;
   }
 
@@ -48,13 +42,12 @@ export class TranslationRefImpl<
   }
 
   private constructor(
-    private readonly config: TranslationRefConfig<LazyMessages, Messages>,
+    private readonly config: TranslationRefConfig<Messages>,
   ) {}
 }
 
 export const createTranslationRef = <
-  LazyMessages extends Record<string, string>,
-  Messages extends Record<string, string> = {},
+  Messages extends Record<keyof Messages, string> = {},
 >(
-  config: TranslationRefConfig<LazyMessages, Messages>,
-): TranslationRef<LazyMessages, Messages> => TranslationRefImpl.create(config);
+  config: TranslationRefConfig<Messages>,
+): TranslationRef<Messages> => TranslationRefImpl.create(config);

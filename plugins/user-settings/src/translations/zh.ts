@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-export const messages = {
+import { UserSettingPluginMessages } from '../translation';
+
+export const messages: UserSettingPluginMessages = {
   language: '语言',
   change_the_language: '更改语言',
   theme: '主题',
@@ -25,4 +27,6 @@ export const messages = {
   select_theme_light: '选择浅色主题',
   select_theme_dark: '选择深色主题',
   select_theme_auto: '选择自动主题',
+  lng: '中文',
+  select_lng: '选择中文',
 };

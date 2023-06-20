@@ -15,28 +15,19 @@
  */
 
 export interface TranslationRefConfig<
-  LazyMessages extends Record<string, string>,
-  Messages extends Record<string, string>,
+  Messages extends Record<keyof Messages, string>,
 > {
   id: string;
-  lazyResources: Record<string, () => Promise<{ messages: LazyMessages }>>;
+  lazyResources: Record<string, () => Promise<{ messages: Messages }>>;
   resources?: Record<string, Messages>;
 }
 
 export interface TranslationRef<
-  LazyMessages extends Record<string, string> = Record<string, string>,
-  Messages extends Record<string, string> = Record<string, string>,
+  Messages extends Record<keyof Messages, string> = Record<string, string>,
 > {
   getId(): string;
 
   getResources(): Record<string, Messages> | undefined;
 
-  getLazyResources(): Record<string, () => Promise<{ messages: LazyMessages }>>;
+  getLazyResources(): Record<string, () => Promise<{ messages: Messages }>>;
 }
-
-export type Translations<T extends TranslationRef> = T extends TranslationRef<
-  infer LazyMessages,
-  infer Messages
->
-  ? Partial<Record<keyof LazyMessages | keyof Messages, string>>
-  : never;

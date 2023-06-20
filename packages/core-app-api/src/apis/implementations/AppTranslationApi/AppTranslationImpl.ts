@@ -17,32 +17,28 @@
 import { AppTranslationApi, TranslationRef } from '@backstage/core-plugin-api';
 import i18next, { type i18n } from 'i18next';
 import { initReactI18next } from 'react-i18next';
+import LanguageDetector from 'i18next-browser-languagedetector';
 
-import { AppOptions } from '../../../app';
+import { AppMessage, AppOptions } from '../../../app';
 
 export class AppTranslationApiImpl implements AppTranslationApi {
-  static create({ modules, options }: AppOptions['initI18next'] = {}) {
+  static create(options: AppOptions['i18n']) {
     const i18n = i18next.createInstance().use(initReactI18next);
 
-    if (modules?.length) {
-      for (const module of modules) {
-        i18n.use(module);
-      }
-    }
+    i18n.use(LanguageDetector);
 
     i18n.init({
-      fallbackLng: 'en',
+      fallbackLng: options?.fallbackLanguage || 'en',
+      supportedLngs: options?.supportedLanguages || ['en'],
       interpolation: {
         escapeValue: false,
       },
-      ...options,
       react: {
         bindI18n: 'loaded languageChanged',
-        ...options?.react,
       },
     });
 
-    return new AppTranslationApiImpl(i18n);
+    return new AppTranslationApiImpl(i18n, options);
   }
 
   private readonly cache = new WeakSet<TranslationRef>();
@@ -52,19 +48,32 @@ export class AppTranslationApiImpl implements AppTranslationApi {
     return this.i18n;
   }
 
-  useTranslationRef<
-    LazyMessages extends Record<string, string>,
-    Messages extends Record<string, string>,
-  >(translationRef: TranslationRef<LazyMessages, Messages>): void {
+  initMessages(options: AppOptions['i18n']) {
+    if (options?.messages?.length) {
+      options.messages.forEach(appMessage => {
+        if (appMessage.messages) {
+          this.useResources(appMessage.ref, appMessage.messages);
+        }
+
+        if (appMessage.lazyMessages) {
+          this.useLazyResources(appMessage.ref, appMessage.lazyMessages);
+        }
+      });
+    }
+  }
+
+  useTranslationRef<Messages extends Record<string, string>>(
+    translationRef: TranslationRef<Messages>,
+  ): void {
     this.useResources(translationRef);
     this.useLazyResources(translationRef);
   }
 
-  useResources<
-    LazyMessages extends Record<string, string>,
-    Messages extends Record<string, string>,
-  >(translationRef: TranslationRef<LazyMessages, Messages>) {
-    const resources = translationRef.getResources();
+  useResources<Messages extends Record<string, string>>(
+    translationRef: TranslationRef<Messages>,
+    initResources?: AppMessage['messages'],
+  ) {
+    const resources = initResources || translationRef.getResources();
     if (!resources || this.cache.has(translationRef)) {
       return;
     }
@@ -80,10 +89,10 @@ export class AppTranslationApiImpl implements AppTranslationApi {
     });
   }
 
-  useLazyResources<
-    LazyMessages extends Record<string, string>,
-    Messages extends Record<string, string>,
-  >(translationRef: TranslationRef<LazyMessages, Messages>) {
+  useLazyResources<Messages extends Record<string, string>>(
+    translationRef: TranslationRef<Messages>,
+    initResources?: AppMessage<Messages>['lazyMessages'],
+  ) {
     let cache = this.lazyCache.get(translationRef);
 
     if (!cache) {
@@ -104,7 +113,7 @@ export class AppTranslationApiImpl implements AppTranslationApi {
     }
 
     const namespace = translationRef.getId();
-    const lazyResources = translationRef.getLazyResources();
+    const lazyResources = initResources || translationRef.getLazyResources();
 
     const fallbackLanguages = services.languageUtils.getFallbackCodes(
       options.fallbackLng,
@@ -158,5 +167,10 @@ export class AppTranslationApiImpl implements AppTranslationApi {
     }
   }
 
-  private constructor(private readonly i18n: i18n) {}
+  private constructor(
+    private readonly i18n: i18n,
+    options: AppOptions['i18n'],
+  ) {
+    this.initMessages(options);
+  }
 }

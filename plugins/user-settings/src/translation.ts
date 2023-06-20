@@ -16,20 +16,27 @@
 
 import { createTranslationRef } from '@backstage/core-plugin-api';
 
-export const userSettingsTranslationRef = createTranslationRef({
-  id: 'user-settings',
-  lazyResources: {
-    zh: () => import('./translations/zh'),
-  },
-  // The following are loaded eagerly because they are used in the settings
-  resources: {
-    en: {
-      lng: 'English',
-      select_lng: 'Select English',
+// why can not use interface
+
+export type UserSettingPluginMessages = {
+  language: string;
+  change_the_language: string;
+  theme: string;
+  theme_light: string;
+  theme_dark: string;
+  theme_auto: string;
+  change_the_theme_mode: string;
+  select_theme_light: string;
+  select_theme_dark: string;
+  select_theme_auto: string;
+  lng: string;
+  select_lng: string;
+};
+
+export const userSettingsTranslationRef =
+  createTranslationRef<UserSettingPluginMessages>({
+    id: 'user-settings',
+    lazyResources: {
+      zh: () => import('./translations/zh'),
     },
-    zh: {
-      lng: '中文',
-      select_lng: '选择中文',
-    },
-  },
-});
+  });

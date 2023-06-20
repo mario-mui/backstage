@@ -113,28 +113,21 @@ import { PuppetDbPage } from '@backstage/plugin-puppetdb';
 import { DevToolsPage } from '@backstage/plugin-devtools';
 import { customDevToolsPage } from './components/devtools/CustomDevToolsPage';
 import { CatalogUnprocessedEntitiesPage } from '@backstage/plugin-catalog-unprocessed-entities';
-import LanguageDetector from 'i18next-browser-languagedetector';
-import Backend from 'i18next-http-backend';
-import { Translations } from '@backstage/core-plugin-api';
 
 const app = createApp({
-  initI18next: {
-    modules: [LanguageDetector, Backend],
-    options: {
-      supportedLngs: ['zh-Hans', 'zh', 'en'],
-      fallbackLng: {
-        'zh-Hans': ['zh', 'en'],
-        default: ['en'],
-      },
-      resources: {
-        'zh-Hans': {
-          'user-settings': {
-            lng: '简体中文',
-            select_lng: '选择简体中文',
-          } satisfies Translations<typeof userSettingsTranslationRef>,
+  i18n: {
+    supportedLanguages: ['zh', 'en'],
+    messages: [
+      {
+        ref: userSettingsTranslationRef,
+        messages: {
+          zh: {
+            select_lng: '选择中文-app',
+            select_lng2: '选择中文-app',
+          },
         },
       },
-    },
+    ],
   },
   apis,
   plugins: Object.values(plugins),

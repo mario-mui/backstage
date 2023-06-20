@@ -21,13 +21,10 @@ import { TranslationRef } from './types';
 import { appTranslationApiRef, useApi } from '../apis';
 
 export const useTranslationRef = <
-  LazyMessages extends Record<string, string>,
-  Messages extends Record<string, string>,
+  Messages extends Record<keyof Messages, string>,
 >(
-  translationRef: TranslationRef<LazyMessages, Messages>,
+  translationRef: TranslationRef<Messages>,
 ) => {
-  type MessageKey = keyof Messages | keyof LazyMessages;
-
   const appTranslationApi = useApi(appTranslationApiRef);
 
   appTranslationApi.useTranslationRef(translationRef);
@@ -35,7 +32,7 @@ export const useTranslationRef = <
   const translation = useTranslation(translationRef.getId());
 
   return translation as Omit<typeof translation, 't'> & {
-    t(key: MessageKey, defaultValue?: string): string;
-    t(key: MessageKey, options?: TOptions): string;
+    t(key: keyof Messages, defaultValue?: string): string;
+    t(key: keyof Messages, options?: TOptions): string;
   };
 };
