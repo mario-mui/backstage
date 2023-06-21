@@ -73,3 +73,4 @@ export type { HasSubcomponentsCardProps } from './components/HasSubcomponentsCar
 export type { HasSystemsCardProps } from './components/HasSystemsCard';
 export type { RelatedEntitiesCardProps } from './components/RelatedEntitiesCard';
 export type { CatalogSearchResultListItemProps } from './components/CatalogSearchResultListItem';
+export { catalogTranslationRef } from './translation';

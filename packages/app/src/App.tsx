@@ -40,6 +40,7 @@ import {
   CatalogEntityPage,
   CatalogIndexPage,
   catalogPlugin,
+  catalogTranslationRef,
 } from '@internal/plugin-catalog-customized';
 
 import { CatalogGraphPage } from '@backstage/plugin-catalog-graph';
@@ -123,11 +124,22 @@ const app = createApp({
         messages: {
           zh: {
             select_lng: '选择中文-app',
+            // @ts-expect-error
             select_lng2: '选择中文-app',
           },
         },
       },
-    ],
+      {
+        ref: catalogTranslationRef,
+        messages: {
+          en: {
+            // @ts-expect-error
+            select_lng: '选择中文',
+            page_title: 'Catalog',
+          },
+        },
+      },
+    ] as const,
   },
   apis,
   plugins: Object.values(plugins),

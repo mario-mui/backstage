@@ -19,6 +19,7 @@ import {
   AppTheme,
   BackstagePlugin,
   IconComponent,
+  TranslationRef,
 } from '@backstage/core-plugin-api';
 import {
   AppComponents,
@@ -33,8 +34,9 @@ import {
  *
  * @public
  */
-export function createApp(
-  options?: Omit<AppOptions, keyof OptionalAppOptions> & OptionalAppOptions,
+export function createApp<TRefs extends ReadonlyArray<TranslationRef>>(
+  options?: Omit<AppOptions<TRefs>, keyof OptionalAppOptions> &
+    OptionalAppOptions,
 ) {
   return createSpecializedApp({
     ...options,

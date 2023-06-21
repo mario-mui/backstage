@@ -180,16 +180,18 @@ export type AppRouteBinder = <
   >,
 ) => void;
 
+type Messages<T> = T extends TranslationRef<infer R>
+  ? Record<string, Partial<R>>
+  : never;
+
 /**
  * The message defined in CreateApp for customize plugin's messages
  *
  */
-export type AppMessage<
-  Messages extends Record<keyof Messages, string> = Record<string, string>,
-> = {
-  ref: TranslationRef<Messages>;
-  lazyMessages?: Record<string, () => Promise<{ messages: Messages }>>;
-  messages?: Record<string, Messages>;
+export type AppMessage<T extends TranslationRef> = {
+  ref: T;
+  messages?: Messages<T>;
+  lazyMessages?: () => Promise<{ messages: Messages<T> }>;
 };
 
 /**
@@ -197,7 +199,9 @@ export type AppMessage<
  *
  * @public
  */
-export type AppOptions = {
+export type AppOptions<
+  TRefs extends ReadonlyArray<TranslationRef> = ReadonlyArray<TranslationRef>,
+> = {
   /**
    * A collection of ApiFactories to register in the application to either
    * add new ones, or override factories provided by default or by plugins.
@@ -297,7 +301,9 @@ export type AppOptions = {
   i18n?: {
     supportedLanguages: string[];
     fallbackLanguage?: FallbackLng;
-    messages?: AppMessage[];
+    messages?: {
+      [K in keyof TRefs]: AppMessage<TRefs[K]>;
+    };
   };
 };
 
